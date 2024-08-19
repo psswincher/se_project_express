@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "lint": "npx islint .",
-    "start": "express app.js",
+    "start": "nodemon app.js",
     "dev": "nodemon app.js"
   },
   "repository": {

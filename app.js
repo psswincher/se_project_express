@@ -10,8 +10,8 @@ mongoose
   .connect("mongodb://127.0.0.1:27017/wtwr_db")
   .then(() => console.log("Connected to DB"));
 
-app.use(bodyParser.json());
 app.use(authorizeUser);
+app.use(bodyParser.json());
 app.use("/", logRequest);
 app.use("/", mainRouter);
 

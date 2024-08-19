@@ -47,7 +47,7 @@ class NO_MATCHING_ID extends API_ERROR {
   constructor(message) {
     super(message);
     this.name = "NO_MATCHING_ID";
-    this.statusCode = 404;
+    this.statusCode = 400;
   }
 }
 

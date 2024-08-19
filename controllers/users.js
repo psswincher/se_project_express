@@ -14,7 +14,7 @@ module.exports.getUsers = (req, res) => {
 
 module.exports.getUserById = (req, res) => {
   User.findById(req.params._userId)
-    .orFail((err) => {
+    .orFail(() => {
       const error = new NO_MATCHING_USER_ID(
         `No matching user for id '${req.params._userId}'`
       );
@@ -27,10 +27,10 @@ module.exports.getUserById = (req, res) => {
           `Can't find user by id '${req.params._userId}', format is invalid.`
         );
         handleError(error, res);
+      } else if (err instanceof NO_MATCHING_USER_ID) {
+        handleError(err, res);
       } else {
-        err instanceof NO_MATCHING_USER_ID
-          ? handleError(err, res)
-          : handleDefaultError("Error getting user by id", res);
+        handleDefaultError(err.message, res);
       }
     });
 };

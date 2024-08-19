@@ -6,9 +6,9 @@ module.exports.authorizeUser = (req, res, next) => {
 };
 
 module.exports.logRequest = (req, res, next) => {
-  console.log("request received");
-  console.log(req.url);
-  console.log(req.user);
-  console.log(req.body);
+  // console.log("request received");
+  // console.log(req.url);
+  // console.log(req.user);
+  // console.log(req.body);
   next();
 };

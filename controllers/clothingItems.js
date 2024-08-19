@@ -51,10 +51,10 @@ module.exports.likeItem = (req, res) => {
           `No matching item for id '${req.params._itemId}', id format is invalid.`
         );
         handleError(error, res);
+      } else if (err instanceof NO_MATCHING_ITEM_ID) {
+        handleError(err, res);
       } else {
-        err instanceof NO_MATCHING_ITEM_ID
-          ? handleError(err, res)
-          : handleDefaultError(err.message, res);
+        handleDefaultError(err.message, res);
       }
     });
 };

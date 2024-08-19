@@ -13,9 +13,26 @@ module.exports.getClothingItems = (req, res) => {
 };
 
 module.exports.deleteClothingItem = (req, res) => {
-  ClothingItem.findByIdAndRemove(req.params.id)
+  ClothingItem.findByIdAndRemove(req.params._itemId)
+    .orFail(() => {
+      const error = new NO_MATCHING_ITEM_ID(
+        `No matching item in database for id '${req.params._itemId}'`
+      );
+      throw error;
+    })
     .then((user) => res.status(200).send({ data: user }))
-    .catch((err) => handleDefaultError(err.message, res));
+    .catch((err) => {
+      if (err.name === "CastError") {
+        const error = new ROUTE_CAST_ERROR(
+          `No matching item for id '${req.params._itemId}', id format is invalid.`
+        );
+        handleError(error, res);
+      } else if (err instanceof NO_MATCHING_ITEM_ID) {
+        handleError(err, res);
+      } else {
+        handleDefaultError(err.message, res);
+      }
+    });
 };
 
 module.exports.createClothingItem = (req, res) => {

@@ -1,9 +1,5 @@
 const ClothingItem = require("../models/clothingItem");
-const {
-  INVALID_ITEM_DATA,
-  NO_MATCHING_ITEM_ID,
-  ROUTE_CAST_ERROR,
-} = require("../utils/errors");
+const { BAD_REQUEST, RESOURCE_NOT_FOUND } = require("../utils/errors");
 const { handleDefaultError, handleError } = require("../utils/errorHandler");
 
 module.exports.getClothingItems = (req, res) => {
@@ -15,19 +11,19 @@ module.exports.getClothingItems = (req, res) => {
 module.exports.deleteClothingItem = (req, res) => {
   ClothingItem.findByIdAndRemove(req.params._itemId)
     .orFail(() => {
-      const error = new NO_MATCHING_ITEM_ID(
+      const error = new RESOURCE_NOT_FOUND(
         `No matching item in database for id '${req.params._itemId}'`
       );
       throw error;
     })
-    .then((user) => res.status(200).send({ data: user }))
+    .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === "CastError") {
-        const error = new ROUTE_CAST_ERROR(
+        const error = new BAD_REQUEST(
           `No matching item for id '${req.params._itemId}', id format is invalid.`
         );
         handleError(error, res);
-      } else if (err instanceof NO_MATCHING_ITEM_ID) {
+      } else if (err instanceof RESOURCE_NOT_FOUND) {
         handleError(err, res);
       } else {
         handleDefaultError(err.message, res);
@@ -38,10 +34,10 @@ module.exports.deleteClothingItem = (req, res) => {
 module.exports.createClothingItem = (req, res) => {
   const { name, imageUrl, weather } = req.body;
   ClothingItem.create({ name, imageUrl, owner: req.user._id, weather })
-    .then((clothingItem) => res.status(200).send({ data: clothingItem }))
+    .then((clothingItem) => res.send({ data: clothingItem }))
     .catch((err) => {
       if (err.name === "ValidationError") {
-        const error = new INVALID_ITEM_DATA(err.message);
+        const error = new BAD_REQUEST(err.message);
         handleError(error, res);
       } else {
         handleDefaultError(err.message, res);
@@ -56,7 +52,7 @@ module.exports.likeItem = (req, res) => {
     { new: true }
   )
     .orFail(() => {
-      const error = new NO_MATCHING_ITEM_ID(
+      const error = new RESOURCE_NOT_FOUND(
         `No matching item in database for id '${req.params._itemId}'`
       );
       throw error;
@@ -64,11 +60,11 @@ module.exports.likeItem = (req, res) => {
     .then((data) => res.status(200).send(data))
     .catch((err) => {
       if (err.name === "CastError") {
-        const error = new ROUTE_CAST_ERROR(
+        const error = new BAD_REQUEST(
           `No matching item for id '${req.params._itemId}', id format is invalid.`
         );
         handleError(error, res);
-      } else if (err instanceof NO_MATCHING_ITEM_ID) {
+      } else if (err instanceof RESOURCE_NOT_FOUND) {
         handleError(err, res);
       } else {
         handleDefaultError(err.message, res);
@@ -83,7 +79,7 @@ module.exports.dislikeItem = (req, res) => {
     { new: true }
   )
     .orFail(() => {
-      const error = new NO_MATCHING_ITEM_ID(
+      const error = new RESOURCE_NOT_FOUND(
         `No matching item for id ${req.params.id}`
       );
       throw error;
@@ -91,11 +87,11 @@ module.exports.dislikeItem = (req, res) => {
     .then((data) => res.status(200).send(data))
     .catch((err) => {
       if (err.name === "CastError") {
-        const error = new ROUTE_CAST_ERROR(
+        const error = new BAD_REQUEST(
           `No matching item for id '${req.params._itemId}', id format is invalid.`
         );
         handleError(error, res);
-      } else if (err instanceof NO_MATCHING_ITEM_ID) {
+      } else if (err instanceof RESOURCE_NOT_FOUND) {
         handleError(err, res);
       } else {
         handleDefaultError(err.message, res);

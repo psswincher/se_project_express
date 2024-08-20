@@ -89,12 +89,16 @@ module.exports.dislikeItem = (req, res) => {
       );
       throw error;
     })
-    .catch((err) =>
-      err instanceof NO_MATCHING_ITEM_ID
-        ? handleError(err, res)
-        : handleDefaultError(
-            "Error unliking item by id, item id not found",
-            res
-          )
-    );
+    .catch((err) => {
+      if (err.name === "CastError") {
+        const error = new ROUTE_CAST_ERROR(
+          `No matching item for id '${req.params._itemId}', id format is invalid.`
+        );
+        handleError(error, res);
+      } else if (err instanceof NO_MATCHING_ITEM_ID) {
+        handleError(err, res);
+      } else {
+        handleDefaultError(err.message, res);
+      }
+    });
 };

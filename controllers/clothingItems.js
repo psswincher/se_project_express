@@ -82,13 +82,13 @@ module.exports.dislikeItem = (req, res) => {
     { $pull: { likes: req.user._id } }, // remove _id from the array
     { new: true }
   )
-    .then((data) => res.status(200).send(data))
     .orFail(() => {
       const error = new NO_MATCHING_ITEM_ID(
-        `No matching user for id ${req.params.id}`
+        `No matching item for id ${req.params.id}`
       );
       throw error;
     })
+    .then((data) => res.status(200).send(data))
     .catch((err) => {
       if (err.name === "CastError") {
         const error = new ROUTE_CAST_ERROR(

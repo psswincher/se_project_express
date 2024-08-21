@@ -1,10 +1,11 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const { auth } = require("./middlewares/auth");
 
 const bodyParser = require("body-parser");
 const mainRouter = require("./routes/index");
-const { logRequest } = require("./middleware/logRequest");
+const { logRequest } = require("./middlewares/logRequest");
 
 const { PORT = 3001 } = process.env;
 

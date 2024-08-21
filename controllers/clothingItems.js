@@ -13,11 +13,7 @@ module.exports.getClothingItems = (req, res) => {
 };
 
 module.exports.deleteClothingItem = (req, res) => {
-  if (!req.params._id.equals(req.user)) {
-    return new FORBIDDEN_REQUEST("User does not have permissions to delete");
-  }
-
-  ClothingItem.findByIdAndRemove(req.params._id)
+  ClothingItem.findById(req.params._id)
     .orFail(() => {
       const error = new RESOURCE_NOT_FOUND(
         `No matching item in database for id '${req.params._id}'`
@@ -25,7 +21,12 @@ module.exports.deleteClothingItem = (req, res) => {
       throw error;
     })
     .then((item) => {
-      res.send({ data: item });
+      if (!item.owner.equals(req.user)) {
+        throw new FORBIDDEN_REQUEST("User does not have permissions to delete");
+      }
+      ClothingItem.deleteOne({ _id: item._id }).then((item) =>
+        res.send({ data: item })
+      );
     })
     .catch((err) => {
       if (err.name === "CastError") {
@@ -33,7 +34,10 @@ module.exports.deleteClothingItem = (req, res) => {
           `No matching item for id '${req.params._id}', id format is invalid.`
         );
         handleError(error, res);
-      } else if (err instanceof RESOURCE_NOT_FOUND) {
+      } else if (
+        err instanceof FORBIDDEN_REQUEST ||
+        err instanceof RESOURCE_NOT_FOUND
+      ) {
         handleError(err, res);
       } else {
         handleDefaultError(err.message, res);

@@ -1,8 +1,7 @@
+const validator = require("validator");
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
-const { BAD_REQUEST, INVALID_LOGIN } = require("../utils/errors");
-
-const validator = require("validator");
+const { INVALID_LOGIN } = require("../utils/errors");
 
 const userSchema = new mongoose.Schema({
   name: {

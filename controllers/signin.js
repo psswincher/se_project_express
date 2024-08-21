@@ -1,5 +1,5 @@
-const User = require("../models/user");
 const jwt = require("jsonwebtoken");
+const User = require("../models/user");
 const { JWT_SECRET } = require("../utils/config");
 
 const { INVALID_LOGIN, BAD_REQUEST } = require("../utils/errors");

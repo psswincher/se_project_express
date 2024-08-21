@@ -4,7 +4,7 @@ const signUpRouter = require("./signup");
 const signinRouter = require("./signin");
 const clothingItemRouter = require("./clothingItems");
 const routeNotFound = require("./routeNotFound");
-const { auth } = require("../middleware/auth");
+const { auth } = require("../middlewares/auth");
 
 router.use("/users", auth, userRouter);
 router.use("/items", clothingItemRouter);

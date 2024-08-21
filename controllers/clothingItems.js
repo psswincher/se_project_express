@@ -1,5 +1,9 @@
 const ClothingItem = require("../models/clothingItem");
-const { BAD_REQUEST, RESOURCE_NOT_FOUND } = require("../utils/errors");
+const {
+  BAD_REQUEST,
+  RESOURCE_NOT_FOUND,
+  FORBIDDEN_REQUEST,
+} = require("../utils/errors");
 const { handleDefaultError, handleError } = require("../utils/errorHandler");
 
 module.exports.getClothingItems = (req, res) => {
@@ -9,18 +13,24 @@ module.exports.getClothingItems = (req, res) => {
 };
 
 module.exports.deleteClothingItem = (req, res) => {
-  ClothingItem.findByIdAndRemove(req.params._itemId)
+  if (!req.params._id.equals(req.user)) {
+    return new FORBIDDEN_REQUEST("User does not have permissions to delete");
+  }
+
+  ClothingItem.findByIdAndRemove(req.params._id)
     .orFail(() => {
       const error = new RESOURCE_NOT_FOUND(
-        `No matching item in database for id '${req.params._itemId}'`
+        `No matching item in database for id '${req.params._id}'`
       );
       throw error;
     })
-    .then((user) => res.send({ data: user }))
+    .then((item) => {
+      res.send({ data: item });
+    })
     .catch((err) => {
       if (err.name === "CastError") {
         const error = new BAD_REQUEST(
-          `No matching item for id '${req.params._itemId}', id format is invalid.`
+          `No matching item for id '${req.params._id}', id format is invalid.`
         );
         handleError(error, res);
       } else if (err instanceof RESOURCE_NOT_FOUND) {
@@ -33,7 +43,7 @@ module.exports.deleteClothingItem = (req, res) => {
 
 module.exports.createClothingItem = (req, res) => {
   const { name, imageUrl, weather } = req.body;
-  ClothingItem.create({ name, imageUrl, owner: req.user._id, weather })
+  ClothingItem.create({ name, imageUrl, owner: req.user, weather })
     .then((clothingItem) => res.send({ data: clothingItem }))
     .catch((err) => {
       if (err.name === "ValidationError") {
@@ -47,13 +57,13 @@ module.exports.createClothingItem = (req, res) => {
 
 module.exports.likeItem = (req, res) => {
   ClothingItem.findByIdAndUpdate(
-    req.params._itemId,
-    { $addToSet: { likes: req.user._id } }, // add _id to the array if it's not there yet
+    req.params._id,
+    { $addToSet: { likes: req.user } }, // add _id to the array if it's not there yet
     { new: true }
   )
     .orFail(() => {
       const error = new RESOURCE_NOT_FOUND(
-        `No matching item in database for id '${req.params._itemId}'`
+        `No matching item in database for id '${req.params._id}'`
       );
       throw error;
     })
@@ -61,7 +71,7 @@ module.exports.likeItem = (req, res) => {
     .catch((err) => {
       if (err.name === "CastError") {
         const error = new BAD_REQUEST(
-          `No matching item for id '${req.params._itemId}', id format is invalid.`
+          `No matching item for id '${req.params._id}', id format is invalid.`
         );
         handleError(error, res);
       } else if (err instanceof RESOURCE_NOT_FOUND) {
@@ -74,7 +84,7 @@ module.exports.likeItem = (req, res) => {
 
 module.exports.dislikeItem = (req, res) => {
   ClothingItem.findByIdAndUpdate(
-    req.params._itemId,
+    req.params._id,
     { $pull: { likes: req.user._id } }, // remove _id from the array
     { new: true }
   )
@@ -88,7 +98,7 @@ module.exports.dislikeItem = (req, res) => {
     .catch((err) => {
       if (err.name === "CastError") {
         const error = new BAD_REQUEST(
-          `No matching item for id '${req.params._itemId}', id format is invalid.`
+          `No matching item for id '${req.params._id}', id format is invalid.`
         );
         handleError(error, res);
       } else if (err instanceof RESOURCE_NOT_FOUND) {

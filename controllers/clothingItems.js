@@ -21,14 +21,14 @@ module.exports.deleteClothingItem = (req, res) => {
       throw error;
     })
     .then((item) => {
-      if (!item.owner.equals(req.user)) {
+      if (!item.owner._id === req.user) {
         throw new FORBIDDEN_REQUEST("User does not have permissions to delete");
       } else {
-        ClothingItem.deleteOne({ _id: item._id }).then((deletedItem) =>
-          res.send({ data: deletedItem }).catch((err) => {
+        ClothingItem.deleteOne({ _id: item._id })
+          .then((deletedItem) => res.send({ data: deletedItem }))
+          .catch((err) => {
             throw err;
-          })
-        );
+          });
       }
     })
     .catch((err) => {

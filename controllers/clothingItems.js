@@ -21,7 +21,9 @@ module.exports.deleteClothingItem = (req, res) => {
       throw error;
     })
     .then((item) => {
-      if (!item.owner._id === req.user) {
+      console.log(item.owner._id);
+      console.log(req.user);
+      if (!item.owner._id.equals(req.user)) {
         throw new FORBIDDEN_REQUEST("User does not have permissions to delete");
       } else {
         ClothingItem.deleteOne({ _id: item._id })

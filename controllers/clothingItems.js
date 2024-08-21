@@ -23,10 +23,13 @@ module.exports.deleteClothingItem = (req, res) => {
     .then((item) => {
       if (!item.owner.equals(req.user)) {
         throw new FORBIDDEN_REQUEST("User does not have permissions to delete");
+      } else {
+        ClothingItem.deleteOne({ _id: item._id }).then((deletedItem) =>
+          res.send({ data: deletedItem }).catch((err) => {
+            throw err;
+          })
+        );
       }
-      ClothingItem.deleteOne({ _id: item._id }).then((item) =>
-        res.send({ data: item })
-      );
     })
     .catch((err) => {
       if (err.name === "CastError") {

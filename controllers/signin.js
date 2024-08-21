@@ -15,7 +15,7 @@ module.exports.signin = (req, res) => {
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
         expiresIn: "7d",
       });
-      res.send({ token: token });
+      res.send({ token });
     })
     .catch((err) => {
       if (err instanceof INVALID_LOGIN) {

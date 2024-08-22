@@ -8,7 +8,7 @@ const { handleDefaultError, handleError } = require("../utils/errorHandler");
 
 module.exports.getClothingItems = (req, res) => {
   ClothingItem.find({})
-    .then((clothingItems) => res.status(200).send({ data: clothingItems }))
+    .then((clothingItems) => res.send({ data: clothingItems }))
     .catch((err) => handleDefaultError(err.message, res));
 };
 
@@ -76,7 +76,7 @@ module.exports.likeItem = (req, res) => {
       );
       throw error;
     })
-    .then((data) => res.status(200).send(data))
+    .then((data) => res.send(data))
     .catch((err) => {
       if (err.name === "CastError") {
         const error = new BAD_REQUEST(
@@ -103,7 +103,7 @@ module.exports.dislikeItem = (req, res) => {
       );
       throw error;
     })
-    .then((data) => res.status(200).send(data))
+    .then((data) => res.send(data))
     .catch((err) => {
       if (err.name === "CastError") {
         const error = new BAD_REQUEST(

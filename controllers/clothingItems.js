@@ -21,8 +21,6 @@ module.exports.deleteClothingItem = (req, res) => {
       throw error;
     })
     .then((item) => {
-      console.log(item.owner._id);
-      console.log(req.user);
       if (!item.owner._id.equals(req.user._id)) {
         throw new FORBIDDEN_REQUEST("User does not have permissions to delete");
       } else {
@@ -53,7 +51,7 @@ module.exports.deleteClothingItem = (req, res) => {
 module.exports.createClothingItem = (req, res) => {
   const { name, imageUrl, weather } = req.body;
   ClothingItem.create({ name, imageUrl, owner: req.user, weather })
-    .then((clothingItem) => res.send({ data: clothingItem }))
+    .then((clothingItem) => res.send(clothingItem))
     .catch((err) => {
       if (err.name === "ValidationError") {
         const error = new BAD_REQUEST(err.message);

@@ -9,7 +9,6 @@ const updateUserOptions = {
 };
 
 module.exports.updateUser = (req, res) => {
-  console.log(req.body);
   const updates = {};
   const { name, avatar } = req.body;
   if (name) updates.name = name;
@@ -23,12 +22,13 @@ module.exports.updateUser = (req, res) => {
         throw error;
       })
       .then((user) => {
-        console.log(user);
         res.send({
-          _id: user._id,
-          name: user.name,
-          avatar: user.avatar,
-          email: user.email,
+          user: {
+            id: user._id,
+            name: user.name,
+            avatar: user.avatar,
+            email: user.email,
+          },
         });
       })
       .catch((err) => {
@@ -51,9 +51,6 @@ module.exports.updateUser = (req, res) => {
 };
 
 module.exports.getCurrentUser = (req, res) => {
-  console.log(req.params);
-  console.log(req.user);
-
   User.findById(req.user)
     .orFail(() => {
       const error = new RESOURCE_NOT_FOUND(

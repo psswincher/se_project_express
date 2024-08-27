@@ -1,6 +1,8 @@
 # WTWR (What to Wear?): Back End
 
-This back-end project uses mongoose to interface a front-end with a mongodb database via an Express server, allowing users to create and retrieve clothing items tied to their account. It handles errors through custom classes, and will eventually authenticate users with secure authorization.
+This back-end project uses mongoose to interface a front-end with a mongodb database via an Express server, allowing users to create and retrieve clothing items tied to their account. It handles errors through custom classes, and authenticates users with secure authorization, and is fully deployed to the web!
+
+It can be found at [https://ptownwtwr.crabdance.com/](https://ptownwtwr.crabdance.com/)
 
 ## Running the Project
 

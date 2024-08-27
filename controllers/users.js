@@ -1,6 +1,5 @@
 const User = require("../models/user");
 const { BAD_REQUEST, RESOURCE_NOT_FOUND } = require("../utils/errors");
-const { handleError, handleDefaultError } = require("../utils/errorHandler");
 
 const updateUserOptions = {
   new: true, //
@@ -8,7 +7,7 @@ const updateUserOptions = {
   // upsert: true // if the user entry wasn't found, it will be created
 };
 
-module.exports.updateUser = (req, res) => {
+module.exports.updateUser = (req, res, next) => {
   const updates = {};
   const { name, avatar } = req.body;
   if (name) updates.name = name;
@@ -33,24 +32,22 @@ module.exports.updateUser = (req, res) => {
       })
       .catch((err) => {
         if (err.name === "ValidationError") {
-          const error = new BAD_REQUEST(err.message);
-          handleError(error, res);
+          next(new BAD_REQUEST(err.message));
         } else if (err.name === "CastError") {
-          const error = new BAD_REQUEST(
-            `Can't find user by id '${req.user}', format is invalid.`
+          next(
+            new BAD_REQUEST(
+              `Can't find user by id '${req.user}', format is invalid.`
+            )
           );
-          handleError(error, res);
-        } else if (err instanceof RESOURCE_NOT_FOUND) {
-          handleError(err, res);
         } else {
-          handleDefaultError(err.message, res);
+          next(err);
         }
       });
   }
   return null;
 };
 
-module.exports.getCurrentUser = (req, res) => {
+module.exports.getCurrentUser = (req, res, next) => {
   User.findById(req.user)
     .orFail(() => {
       const error = new RESOURCE_NOT_FOUND(
@@ -68,14 +65,13 @@ module.exports.getCurrentUser = (req, res) => {
     )
     .catch((err) => {
       if (err.name === "CastError") {
-        const error = new BAD_REQUEST(
-          `Can't find user by id '${req.user}', format is invalid.`
+        next(
+          new BAD_REQUEST(
+            `Can't find user by id '${req.user}', format is invalid.`
+          )
         );
-        handleError(error, res);
-      } else if (err instanceof RESOURCE_NOT_FOUND) {
-        handleError(err, res);
       } else {
-        handleDefaultError(err.message, res);
+        next(err);
       }
     });
 };

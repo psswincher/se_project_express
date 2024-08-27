@@ -1,3 +1,8 @@
-const JWT_SECRET = "MyVerySecretKey";
+const { JWT_SECRET = "MyVerySecretKey" } = process.env;
 
-module.exports = { JWT_SECRET };
+const weatherEnum = ["hot", "cold", "warm"];
+
+module.exports = {
+  JWT_SECRET,
+  weatherEnum,
+};

@@ -2,10 +2,9 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const User = require("../models/user");
 const { BAD_REQUEST, NON_UNIQUE_SUBMISSION } = require("../utils/errors");
-const { handleError, handleDefaultError } = require("../utils/errorHandler");
 const { JWT_SECRET } = require("../utils/config");
 
-module.exports.createUser = (req, res) => {
+module.exports.createUser = (req, res, next) => {
   const { name, avatar, email, password } = req.body;
   bcrypt
     .hash(password, 10)
@@ -27,17 +26,13 @@ module.exports.createUser = (req, res) => {
         })
         .catch((err) => {
           if (err.name === "ValidationError") {
-            const error = new BAD_REQUEST(err.message);
-            handleError(error, res);
+            next(new BAD_REQUEST(err.message));
           } else if (err.code === 11000) {
-            const error = new NON_UNIQUE_SUBMISSION(err.message);
-            handleError(error, res);
+            next(new NON_UNIQUE_SUBMISSION(err.message));
           } else {
-            handleDefaultError(err.message, res);
+            next(err);
           }
         })
     )
-    .catch((err) => {
-      handleDefaultError(err.message, res);
-    });
+    .catch(next);
 };

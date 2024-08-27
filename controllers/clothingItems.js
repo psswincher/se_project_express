@@ -4,15 +4,14 @@ const {
   RESOURCE_NOT_FOUND,
   FORBIDDEN_REQUEST,
 } = require("../utils/errors");
-const { handleDefaultError, handleError } = require("../utils/errorHandler");
 
-module.exports.getClothingItems = (req, res) => {
+module.exports.getClothingItems = (req, res, next) => {
   ClothingItem.find({})
     .then((clothingItems) => res.send({ data: clothingItems }))
-    .catch((err) => handleDefaultError(err.message, res));
+    .catch(next);
 };
 
-module.exports.deleteClothingItem = (req, res) => {
+module.exports.deleteClothingItem = (req, res, next) => {
   ClothingItem.findById(req.params._id)
     .orFail(() => {
       const error = new RESOURCE_NOT_FOUND(
@@ -33,36 +32,31 @@ module.exports.deleteClothingItem = (req, res) => {
     })
     .catch((err) => {
       if (err.name === "CastError") {
-        const error = new BAD_REQUEST(
-          `No matching item for id '${req.params._id}', id format is invalid.`
+        next(
+          new BAD_REQUEST(
+            `No matching item for id '${req.params._id}', id format is invalid.`
+          )
         );
-        handleError(error, res);
-      } else if (
-        err instanceof FORBIDDEN_REQUEST ||
-        err instanceof RESOURCE_NOT_FOUND
-      ) {
-        handleError(err, res);
       } else {
-        handleDefaultError(err.message, res);
+        next(err);
       }
     });
 };
 
-module.exports.createClothingItem = (req, res) => {
+module.exports.createClothingItem = (req, res, next) => {
   const { name, imageUrl, weather } = req.body;
   ClothingItem.create({ name, imageUrl, owner: req.user, weather })
     .then((clothingItem) => res.send(clothingItem))
     .catch((err) => {
       if (err.name === "ValidationError") {
-        const error = new BAD_REQUEST(err.message);
-        handleError(error, res);
+        next(new BAD_REQUEST(err.message));
       } else {
-        handleDefaultError(err.message, res);
+        next(err);
       }
     });
 };
 
-module.exports.likeItem = (req, res) => {
+module.exports.likeItem = (req, res, next) => {
   ClothingItem.findByIdAndUpdate(
     req.params._id,
     { $addToSet: { likes: req.user } }, // add _id to the array if it's not there yet
@@ -77,19 +71,18 @@ module.exports.likeItem = (req, res) => {
     .then((data) => res.send(data))
     .catch((err) => {
       if (err.name === "CastError") {
-        const error = new BAD_REQUEST(
-          `No matching item for id '${req.params._id}', id format is invalid.`
+        next(
+          new BAD_REQUEST(
+            `No matching item for id '${req.params._id}', id format is invalid.`
+          )
         );
-        handleError(error, res);
-      } else if (err instanceof RESOURCE_NOT_FOUND) {
-        handleError(err, res);
       } else {
-        handleDefaultError(err.message, res);
+        next(err);
       }
     });
 };
 
-module.exports.dislikeItem = (req, res) => {
+module.exports.dislikeItem = (req, res, next) => {
   ClothingItem.findByIdAndUpdate(
     req.params._id,
     { $pull: { likes: req.user._id } }, // remove _id from the array
@@ -104,14 +97,13 @@ module.exports.dislikeItem = (req, res) => {
     .then((data) => res.send(data))
     .catch((err) => {
       if (err.name === "CastError") {
-        const error = new BAD_REQUEST(
-          `No matching item for id '${req.params._id}', id format is invalid.`
+        next(
+          new BAD_REQUEST(
+            `No matching item for id '${req.params._id}', id format is invalid.`
+          )
         );
-        handleError(error, res);
-      } else if (err instanceof RESOURCE_NOT_FOUND) {
-        handleError(err, res);
       } else {
-        handleDefaultError(err.message, res);
+        next(err);
       }
     });
 };

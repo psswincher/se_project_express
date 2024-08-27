@@ -26,5 +26,6 @@ module.exports = {
     "no-underscore-dangle": ["warn", { allow: ["_id", "_itemId", "_userId"] }],
     "max-classes-per-file": 0,
     "consistent-return": 0,
+    "no-unused-vars": ["error", { argsIgnorePattern: "next" }],
   },
 };

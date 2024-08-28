@@ -13,9 +13,9 @@ const {
 } = require("../controllers/clothingItems");
 
 router.get("/", getClothingItems);
-router.delete("/:_id", auth, deleteClothingItem);
+router.delete("/:_id", auth, validateId, deleteClothingItem);
 router.post("/", validateCreateClothingItem, auth, createClothingItem);
-router.put("/:_id/likes", validateId, auth, likeItem);
-router.delete("/:_id/likes", validateId, auth, dislikeItem);
+router.put("/:_id/likes", auth, validateId, likeItem);
+router.delete("/:_id/likes", auth, validateId, dislikeItem);
 
 module.exports = router;
